@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 // import { useFormik } from "formik";
 import {
   Formik,
@@ -23,8 +23,24 @@ const initialValues = {
   phoneNumbers: ["", ""],
   phNumbers: [""],
 };
-const onSubmit = (values) => {
+const savedValues = {
+  name: "Guru ",
+  email: "guru@gmail.com",
+  channel: "GuruReyo",
+  comments: "Gureyo is good",
+  address: "skdjfds",
+  social: {
+    facebook: "",
+    twitter: "",
+  },
+  phoneNumbers: ["", ""],
+  phNumbers: [""],
+};
+const onSubmit = (values ,onSubmitProps) => {
   console.log("Form Data", values);
+  console.log(onSubmitProps)
+  onSubmitProps.setSubmitting(false);
+  onSubmitProps.resetForm();
 };
 // const validate = (values) => {
 //   //values.name,values.email,values.channel
@@ -48,14 +64,10 @@ const validationSchema = Yup.object({
   email: Yup.string().email("Inavalid Email Format").required("Required!"),
   channel: Yup.string().required("Required!"),
   comments: Yup.string()
-    .min(5, "Minimum 5 characters required")
-    .max(100, "Only 100 characters are allowed")
     .required("Required"),
 
   // phoneNumbers:Yup.number().required("Required"),
   address: Yup.string()
-    .min(10, "Enter atleat 10 characters of info")
-    .max(200)
     .required("Required"),
 });
 const validateComments = (value) => {
@@ -75,11 +87,13 @@ function YoutubeForm() {
   //   console.log("Form Values", formik.values);
   // console.log('Form Errors',formik.errors)
   // console.log("Visited fields", formik.touched);
+  const [formValues,setFormValues]=useState(null);
   return (
     <Formik
-      initialValues={initialValues}
+      initialValues={formValues ||initialValues }
       validationSchema={validationSchema}
       onSubmit={onSubmit}
+      enableReinitialize
       // validateOnChange={false}
       // validateOnBlur={false}
       // validateOnMount
@@ -198,7 +212,7 @@ function YoutubeForm() {
                 }}
               </FieldArray>
             </div>
-            <button
+            {/* <button
               type="submit"
               onClick={() => formik.validateField("comments")}
             >
@@ -213,8 +227,11 @@ function YoutubeForm() {
               email:true,
               channel:true,
               comments:true
-            })}>Visit Fields</button>
-            <button type="submit" disabled={!(formik.dirty &&  formik.isValid)}>Submit</button>
+            })}>Visit Fields</button> */}
+            <button type='button' onClick={()=>setFormValues(savedValues)}>Load Saved Data</button>
+            {/* <button type="submit" disabled={!(formik.dirty &&  formik.isValid)}>Submit</button> */}
+            <button type="submit" disabled={!(formik.isValid || formik.isSubmitting )}>Submit</button>
+            <button type="reset" onClick={formik.handleReset}>Reset</button>
           </Form>
         );
       }}
